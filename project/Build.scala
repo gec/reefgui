@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 
 object ApplicationBuild extends Build {
 
@@ -16,7 +16,7 @@ object ApplicationBuild extends Build {
   )
 
 
-  val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
+  val main = play.Project(appName, appVersion, appDependencies).settings(
     // Add your own project settings here
    
     resolvers += "scala-tools" at "http://repo.typesafe.com/typesafe/scala-tools-releases-cache",

@@ -2,7 +2,7 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import libs.json.{Json, JsValue}
+import libs.json.{JsNull, JsUndefined, Json, JsValue}
 import org.totalgrid.reef.client.Client
 import org.totalgrid.reef.client.settings.util.PropertyReader
 import org.totalgrid.reef.client.factory.ReefConnectionFactory
@@ -91,6 +91,7 @@ object Application extends Controller {
       case Measurement.Type.INT => m.getIntVal
       case Measurement.Type.STRING => m.getStringVal
       case Measurement.Type.BOOL => m.getBoolVal
+      case Measurement.Type.NONE => JsNull  //JsUndefined
     }
     Json.toJson(Map("name" -> m.getName, "value" -> measValue.toString, "unit" -> m.getUnit, "time" -> m.getTime.toString, "shortQuality" -> shortQuality(m), "longQuality" -> longQuality(m)))
   }

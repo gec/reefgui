@@ -1,0 +1,60 @@
+@(throwable: Throwable)
+
+@display(ex: Throwable) = {
+<h4>Exception</h4><p>@ex.toString</p>
+<h4>Message</h4><p>@ex.getMessage</p>
+<h4>Stack Trace</h4>
+<table class="table table-condensed">
+    <thead>
+    <tr>
+        <th>File</th>
+        <th>Class.method</th>
+    </tr>
+    </thead>
+    <tbody>
+    @for( element <- ex.getStackTrace ) {
+    <tr ng-repeat="client in clients">
+        <td>@element.getFileName line @element.getLineNumber</td>
+        <td>@(element.getClassName).@element.getMethodName</td>
+    </tr>
+    }
+    </tbody>
+</table>
+}
+
+@main("onError Happened") {
+
+    <div class="alert alert-error" style="margin-bottom: 10px;">
+        <h2>Internal Error</h2>
+        <p>Try the menu bar above to get back to the console.</p>
+    </div>
+
+    <h3>Exception Details</h3>
+    @display( throwable)
+
+    @if( throwable.getCause != null) {
+        <h3>Cause 1</h3>
+        @display( throwable.getCause)
+    }
+
+    @if( throwable.getCause.getCause != null) {
+        <h3>Cause 2</h3>
+        @display( throwable.getCause.getCause)
+
+        @if( throwable.getCause.getCause.getCause != null) {
+            <h3>Cause 3</h3>
+            @display( throwable.getCause.getCause.getCause)
+
+                @if( throwable.getCause.getCause.getCause.getCause != null) {
+                    <h3>Cause 4</h3>
+                    @display( throwable.getCause.getCause.getCause.getCause)
+
+                    @if( throwable.getCause.getCause.getCause.getCause.getCause != null) {
+                        <h3>Cause 5</h3>
+                        @display( throwable.getCause.getCause.getCause.getCause.getCause)
+                }
+            }
+        }
+
+    }
+}
