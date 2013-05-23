@@ -5,24 +5,25 @@
 # Home page
 GET     /                           controllers.Application.index
 
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /login                      controllers.Application.getLoginOrAlreadyLoggedIn
+DELETE  /login                      controllers.Application.deleteLogin
+POST    /login                      controllers.Application.postLogin
 
-GET     /login                       controllers.Application.getLogin
-POST    /services/login             controllers.Application.postLogin
-GET     /services/status             controllers.Application.getServicesStatus
 GET     /services/websocket          controllers.Application.getWebSocket( authToken)
-GET     /entities                    controllers.Application.getEntities(types: List[String])
+
+GET     /entities                   controllers.Application.getEntities(types: List[String])
+GET     /points                     controllers.Application.getPoints
+GET     /commands                     controllers.Application.getCommands
+GET     /commands/:name               controllers.Application.getCommand(name: String)
+
+
+#### OLD STUFF
 GET     /entity/*name                controllers.Application.getEntityDetail(name)
 GET     /equipmentwithpointsbytype   controllers.Application.getEquipmentWithPointsByType( eqTypes: List[String], pointTypes: List[String])
 
 GET     /measurement                 controllers.Application.getMeasurements
 
-GET     /point                       controllers.Application.getPoints
 GET     /point/*name                 controllers.Application.getPointDetail(name)
-
-GET     /command                     controllers.Application.getCommands
-GET     /command/*name               controllers.Application.getCommandDetail(name)
 
 GET     /endpoint                    controllers.Application.getEndpoints
 GET     /endpoint/*name              controllers.Application.getEndpointDetail(name)
@@ -39,3 +40,7 @@ GET     /agent/*name                 controllers.Application.getAgentDetail(name
 
 GET     /permissionset                       controllers.Application.getPermissionSets
 GET     /permissionset/*name                 controllers.Application.getPermissionSetDetail(name)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /*file                      controllers.Assets.at(path="/public", file)

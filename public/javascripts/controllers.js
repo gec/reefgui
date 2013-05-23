@@ -121,13 +121,25 @@ function LoginControl($rootScope, $scope, reef, $timeout) {
 
 }
 
+function LogoutControl($rootScope, $scope, reef, $timeout) {
+
+    $scope.status = reef.getStatus()
+    reef.logout();
+
+    $rootScope.currentMenuItem = "loading";  // so the menus & breadcrumbs will stay hidden
+    $rootScope.breadcrumbs = [
+        { name: "Reef", url: "#/"},
+        { name: "Logout" }
+    ];
+}
+
 function EntityControl($rootScope, $scope, reef) {
     $rootScope.currentMenuItem = "entity";
     $rootScope.breadcrumbs = [
         { name: "Reef", url: "#/"},
         { name: "Entities" }
     ];
-    console.log( "/entities")
+    console.log( "EntityControl")
     reef.get( "/entities", "entities", $scope);
 }
 
@@ -151,7 +163,7 @@ function PointControl($rootScope, $scope, reef) {
         { name: "Points" }
     ];
 
-    reef.get( "/point", "points", $scope);
+    reef.get( "/points", "points", $scope);
 }
 
 function PointDetailControl($rootScope, $scope, $routeParams, reef) {
@@ -174,7 +186,7 @@ function CommandControl($rootScope, $scope, reef) {
         { name: "Commands" }
     ];
 
-    reef.get( "/command", "commands", $scope);
+    reef.get( "/commands", "commands", $scope);
 }
 
 function CommandDetailControl($rootScope, $scope, $routeParams, reef) {
@@ -187,7 +199,7 @@ function CommandDetailControl($rootScope, $scope, $routeParams, reef) {
         { name: commandName }
     ];
 
-    reef.get( '/command/' + commandName, "command", $scope);
+    reef.get( '/commands/' + commandName, "command", $scope);
 }
 
 function MeasurementControl($rootScope, $scope, $filter, reef) {

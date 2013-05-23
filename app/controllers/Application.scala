@@ -46,6 +46,7 @@ import play.api.libs.json.JsString
 import play.api.libs.json.JsObject
 import models.ReefClientActor.Service
 import play.api.libs.concurrent.Execution.Implicits._
+import org.totalgrid.coral.controllers._
 
 
 object ClientPushActorFactory extends ReefClientActorChildFactory{
@@ -63,7 +64,7 @@ case class EquipmentWithPointEntities( equipment: Entity, pointEntities: List[En
 case class EquipmentWithPointsWithTypes( equipment: Entity, pointsWithTypes: List[PointWithTypes])
 
 
-object Application extends Controller {
+object Application extends Controller with ReefAuthenticationImpl with RestServices {
   import JsonFormatters._
   import models.ConnectionStatus._
 
@@ -73,6 +74,8 @@ object Application extends Controller {
   //val reefClientActor = Akka.system.actorOf(Props( new ReefClientActor( this, ClientPushActorFactory)), name = "reefClientActor")
   // For actor ask
   implicit val timeout = Timeout(2 seconds)
+  var reefConnectionManager: ActorRef = null
+  def connectionManager: ActorRef = reefConnectionManager
 
   val reefClients = collection.mutable.Map[String, ActorRef]()
 
@@ -86,25 +89,6 @@ object Application extends Controller {
           case _ => None
         }
       case None => None
-    }
-  }
-
-  /**
-   * An Action needing a reefClient ActorRef
-   *
-   */
-  def ReefClientAction(f: (Request[AnyContent], ActorRef) => Result): Action[AnyContent] = {
-    Action { request =>
-
-      getReefClient( request.headers) match {
-
-        case Some( client: ActorRef) =>
-          f(request, client)
-
-        case None =>
-          Logger.info( "ReefClientAction authToken unrecognized")
-          AUTHTOKEN_UNRECOGNIZED.httpResults( ConnectionStatusFormat.writes( AUTHTOKEN_UNRECOGNIZED))
-      }
     }
   }
 
@@ -143,73 +127,9 @@ object Application extends Controller {
     reefClients.contains( authToken)
   }
 
-  def index = Action { implicit request =>
-    Logger.debug( "index")
-    if( alreadyLoggedIn( request)) {
-      Logger.debug( "index redirect /assets/index.html")
-      Redirect("/assets/index.html")
-    } else {
-      Logger.debug( "index redirect routes.Application.getLogin")
-      Redirect(routes.Application.getLogin).withSession( session - "authToken")
-    }
-  }
-
-  def getLogin = Action { implicit request =>
-
-    Logger.debug( "getLogin")
-    if( alreadyLoggedIn( request)) {
-      Logger.debug( "getLogin alreadyLoggedIn:true redirect routes.Application.index")
-      Redirect(routes.Application.index)
-    } else {
-      Logger.debug( "getLogin alreadyLoggedIn:false redirect /assets/login.html")
-      Redirect("/assets/login.html")
-    }
-  }
-
-  def getServicesStatus = ReefClientAction { (request, client) =>
-  // Async unwinds the promise.
-    Async {
-      (client ? ClientStatusRequest).map {
-        case ClientStatus( status) => {
-          Logger.info( "getServicesStatus StatusReply: " + status.toString)
-          Ok( ConnectionStatusFormat.writes( status))
-        }
-      }
-    }
-  }
-
-  def postLogin = Action( parse.json) { request =>
-    request.body.validate( loginReads).map { login =>
-      postLoginAsync( request, login)
-    }.recoverTotal { error =>
-      Logger.error( "ERROR: postLogin bad json: " + JsError.toFlatJson(error))
-      //TODO: BadRequest("Detected error:"+ JsError.toFlatJson(error))
-      INVALID_REQUEST.httpResults( LoginErrorFormat.writes( LoginError( INVALID_REQUEST)))
-      //INVALID_REQUEST.httpResults( LoginError( INVALID_REQUEST))
-    }
-  }
-
-  def postLoginAsync( request: Request[JsValue], login: Login): AsyncResult = {
-
-    val reefClient = Akka.system.actorOf(Props( new ReefClientActor( ClientPushActorFactory)))
-    Logger.info( "postLogin reefClient " + reefClient )
-
-    Async {
-      (reefClient ? login).map {
-        case reply: LoginSuccess => {
-          Logger.info( "postLogin loginSuccess authToken:" + reply.authToken)
-          reefClients += (reply.authToken -> reefClient)
-          Ok( Json.toJson( reply)).withSession(
-            request.session + ("authToken" -> reply.authToken)
-          )
-        }
-        case reply: LoginError => {
-          Logger.info( "postLogin loginError: " + reply.status)
-          Akka.system.stop( reefClient)
-          reply.status.httpResults( LoginErrorFormat.writes( reply))
-        }
-      }
-    }
+  def index = AuthenticatedPageAction { (request, client) =>
+    Logger.debug( "Application.index")
+    Ok(views.html.index("Coral Sample"))
   }
 
   def getMessageNameAndData( json: JsValue): (String, JsValue) = json.as[JsObject].fields(0)
@@ -333,18 +253,6 @@ object Application extends Controller {
     ( entity, pointsWithTypes)
   }
 
-  def getEntities( types: List[String]) = ServiceAction { (request, service) =>
-    Logger.info( "getEntities")
-
-    val entities = types.length match {
-      case 0 => service.getEntities().await()
-      case _ => service.getEntitiesWithTypes( types).await()
-    }
-    val result = Json.toJson(entities.map(ent => Json.toJson(Map("name" -> Json.toJson(ent.getName), "types" -> Json.toJson(ent.getTypesList.toList)))))
-
-    Ok(result.toString)
-  }
-
   def getEntityDetail(entName: String) = ServiceAction { (request, service) =>
 
     val ent = service.getEntityByName(entName).await()
@@ -362,44 +270,11 @@ object Application extends Controller {
     }
   }
 
-  def getPoints = ServiceAction { (request, service) =>
-
-    val points = service.getPoints().await()
-
-    val result = Json.toJson(points.map(pointToJson(_, false)))
-
-    Ok(result.toString)
-  }
-
   def getPointDetail(pointName: String) = ServiceAction { (request, service) =>
 
     val point = service.getPointByName(pointName).await()
 
     Ok(pointToJson(point, true))
-  }
-
-  private def commandToJson(command: Command, includeUuid: Boolean): JsValue = {
-    if (!includeUuid) {
-      Json.toJson(Map("name" -> Json.toJson(command.getName), "commandType" -> Json.toJson(command.getType.toString), "displayName" -> Json.toJson(command.getDisplayName), "endpoint" -> Json.toJson(command.getEndpoint.getName)))
-    } else {
-      Json.toJson(Map("name" -> Json.toJson(command.getName), "commandType" -> Json.toJson(command.getType.toString), "displayName" -> Json.toJson(command.getDisplayName), "endpoint" -> Json.toJson(command.getEndpoint.getName), "uuid" -> Json.toJson(command.getUuid.getValue)))
-    }
-  }
-
-  def getCommands = ServiceAction { (request, service) =>
-
-    val commands = service.getCommands().await()
-
-    val result = Json.toJson(commands.map(commandToJson(_, false)))
-
-    Ok(result.toString)
-  }
-
-  def getCommandDetail(commandName: String) = ServiceAction { (request, service) =>
-
-    val command = service.getCommandByName(commandName).await()
-
-    Ok(commandToJson(command, true))
   }
 
   private def buildEndpointJson(end: EndpointConnection): JsValue = {

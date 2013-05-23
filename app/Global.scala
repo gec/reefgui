@@ -17,33 +17,32 @@
  * the License.
  */
 
+import akka.actor.Props
 import controllers.Application
-import java.io.IOException
-import org.totalgrid.reef.client.{Connection, Client}
-import org.totalgrid.reef.client.factory.ReefConnectionFactory
-import org.totalgrid.reef.client.service.list.ReefServices
-import org.totalgrid.reef.client.settings.{UserSettings, AmqpSettings}
-import org.totalgrid.reef.client.settings.util.PropertyReader
 import play.api._
 import libs.concurrent.Akka
 import play.api.Application
-import scala.collection.JavaConversions._
-
+import play.api.Play.current
+import org.totalgrid.coral.models.ReefConnectionManager
 
 object Global extends GlobalSettings {
 
+  lazy val reefConnectionManager = Akka.system.actorOf(Props[ReefConnectionManager], "ReefConnectionManager")
+
   override def onStart(app: Application) {
     super.onStart(app)
-    Logger.info("Application has started")
 
-    //Application.initializeReefClient
-    Logger.info("onStart finished")
+    Logger.info( "Application started")
+    Logger.info( "Starting reef connection manager " + reefConnectionManager)
+    Application.reefConnectionManager = reefConnectionManager
+
+    /*
+    play.api.Play.mode(app) match {
+      case play.api.Mode.Test => // do not schedule anything for Test
+      case _ => Logger.info( "Starting reef connection manager " + reefConnectionManager)
+    }
+    */
+
   }
-
-  override def onStop(app: Application) {
-    super.onStop(app)
-    Logger.info("Application shutdown...")
-  }
-
 }
 
