@@ -94,6 +94,7 @@ var ReefService = function( $rootScope, $timeout, $http, $location, $cookies) {
             })
         },
         onclose: function(event) {
+            console.log( "webSocket.onclose event: " + event)
             webSocketOpen = false
             var code = event.code;
             var reason = event.reason;
@@ -105,6 +106,7 @@ var ReefService = function( $rootScope, $timeout, $http, $location, $cookies) {
             // Let the get handle the redirect. Might need to coordinate something with get in the future.
         },
         onerror: function(event) {
+            console.error( "webSocket.onerror event: " + event)
             var data = event.data;
             var name = event.name;
             var message = event.message;
@@ -124,7 +126,7 @@ var ReefService = function( $rootScope, $timeout, $http, $location, $cookies) {
         var wsUri = location.protocol === "https:" ? "wss:" : "ws:"
         // location.host includes port, ex: "localhost:9000"
         wsUri += "//" + location.host
-        wsUri += "/services/websocket?authToken=" + authToken
+        wsUri += "/websocket?authToken=" + authToken
         var ws = new WS( wsUri)
         ws.onmessage = wsHanders.onmessage
         ws.onopen = wsHanders.onopen
@@ -161,6 +163,8 @@ var ReefService = function( $rootScope, $timeout, $http, $location, $cookies) {
     function handleError( data) {
         //webSocket.close()
         console.log( "webSocket.handleError data.error: " + data.error)
+        if( data.jsError)
+            console.log( "webSocket.handleError data.JsError: " + data.jsError)
 
         var listener = getListenerForMessage( data);
         if( listener && listener.error)
@@ -206,7 +210,7 @@ var ReefService = function( $rootScope, $timeout, $http, $location, $cookies) {
                     $cookies[authTokenName] = authToken
                     console.log( "login success, setting cookie, redirectLocation: '/#' + '" + redirectLocation + "'")
                     if( redirectLocation)
-                    //$location.path( redirectLocation)
+                        //$location.path( redirectLocation)
                         window.location.href = "/#" + redirectLocation
                     else
                         window.location.href = "/#/entity"
@@ -372,7 +376,8 @@ var ReefService = function( $rootScope, $timeout, $http, $location, $cookies) {
 
         httpConfig.headers = {'Authorization': authToken}
 
-        $http.get(url, httpConfig).
+        // encodeURI because objects like point names can have percents in them.
+        $http.get( encodeURI( url), httpConfig).
             success(function(json) {
                 $scope[name] = json;
                 $scope.loading = false;
@@ -581,38 +586,38 @@ angular.module('charlotte.services', ['ngCookies']).
 
         var interceptor = ['$q', '$injector', '$rootScope', '$location', function ($q, $injector, $rootScope, $location) {
 
-            function success(response) {
-                return response;
-            }
-
-            function error(response) {
-                var httpStatus = response.status;
-                if (httpStatus == 401) {
-                    var reef = $injector.get('reef');
-                    reef.redirectLocation = $location.url(); // save the current url so we can redirect the user back
-                    reef.authToken = null
-                    window.location.href = "/login" // $location.path('/login');
-                } else if ((httpStatus === 404 || httpStatus === 0 ) && response.config.url.indexOf(".html")) {
-
-                    var status = {
-                        status: "APPLICATION_SERVER_DOWN",
-                        reinitializing: false,
-                        description: "Application server is not responding. Your network connection is down or the application server appears to be down."
-                    };
-
-                    //var $rootScope = $rootScope || $injector.get('$rootScope');
-                    $rootScope.$broadcast( 'reef.status', status);
-
+                function success(response) {
                     return response;
-                } else {
-                    return $q.reject(response);
                 }
-            }
 
-            return function (promise) {
-                return promise.then(success, error);
-            }
-        }];
+                function error(response) {
+                    var httpStatus = response.status;
+                    if (httpStatus == 401) {
+                        var reef = $injector.get('reef');
+                        reef.redirectLocation = $location.url(); // save the current url so we can redirect the user back
+                        reef.authToken = null
+                        window.location.href = "/login" // $location.path('/login');
+                    } else if ((httpStatus === 404 || httpStatus === 0 ) && response.config.url.indexOf(".html")) {
+
+                        var status = {
+                            status: "APPLICATION_SERVER_DOWN",
+                            reinitializing: false,
+                            description: "Application server is not responding. Your network connection is down or the application server appears to be down."
+                        };
+
+                        //var $rootScope = $rootScope || $injector.get('$rootScope');
+                        $rootScope.$broadcast( 'reef.status', status);
+
+                        return response;
+                    } else {
+                        return $q.reject(response);
+                    }
+                }
+
+                return function (promise) {
+                    return promise.then(success, error);
+                }
+            }];
 
         $httpProvider.responseInterceptors.push(interceptor);
     }]);

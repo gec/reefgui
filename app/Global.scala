@@ -17,17 +17,35 @@
  * the License.
  */
 
-import akka.actor.Props
+import akka.actor.{Props, ActorContext}
 import controllers.Application
+import org.totalgrid.reef.client.Client
 import play.api._
 import libs.concurrent.Akka
 import play.api.Application
+import play.api.libs.iteratee.Concurrent
+import play.api.libs.json.JsValue
 import play.api.Play.current
-import org.totalgrid.coral.models.ReefConnectionManager
+import org.totalgrid.coral.models._
+
+
+object ClientPushActorFactory extends WebSocketPushActorFactory{
+  import ConnectionStatus._
+  import WebSocketMessages._
+
+  def makeChildActor( parentContext: ActorContext, actorName: String, clientStatus: ConnectionStatus, client : Client): WebSocketChannels = {
+    // Create a pushChannel that the new actor will use for push
+    val (enumerator, pushChannel) = Concurrent.broadcast[JsValue]
+    val actorRef = parentContext.actorOf( Props( new WebSocketPushActor( clientStatus, Some(client), pushChannel)) /*, name = actorName*/) // Getting two with the same name
+    val iteratee = WebSocketConsumerImpl.getConsumer( actorRef)
+    WebSocketChannels( iteratee, enumerator)
+  }
+}
+
 
 object Global extends GlobalSettings {
 
-  lazy val reefConnectionManager = Akka.system.actorOf(Props[ReefConnectionManager], "ReefConnectionManager")
+  lazy val reefConnectionManager = Akka.system.actorOf(Props( new ReefConnectionManager( ClientPushActorFactory)), "ReefConnectionManager")
 
   override def onStart(app: Application) {
     super.onStart(app)

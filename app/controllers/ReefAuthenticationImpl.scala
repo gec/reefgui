@@ -47,8 +47,8 @@ trait ReefAuthenticationImpl extends ReefAuthentication {
   def redirectToIndex(request: RequestHeader, authToken: String): Result =
     Redirect( routes.Application.index)
 
-  def loginFailure(request: RequestHeader, loginFailure: AuthenticationFailure): Result =
-    Unauthorized(  Json.toJson( loginFailure))
+  def authenticationFailure(request: RequestHeader, failure: AuthenticationFailure): Result =
+    Unauthorized(  Json.obj( "error" -> failure.status))
 
   def logoutSuccess(request: RequestHeader): PlainResult =
     Ok( Json.obj( "success" -> true))
