@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>Reef GUI</title>
-  <link rel="stylesheet" href="css/bootstrap.css">
-  <link rel="stylesheet" href="css/app.css"/>
+  <link rel="stylesheet" href="stylesheets/bootstrap.css">
+  <link rel="stylesheet" href="stylesheets/app.css"/>
     <style type="text/css">
         body {
         padding-top: 60px;
@@ -20,7 +20,89 @@
 
     <div class="container-fluid">
         <div class="row-fluid">
-            <div class="span10">
+            <div class="span6">
+
+
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>State</th>
+                    <th title="% State of Charge">SOC %</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>discharging</td>
+                    <td><i class="icon-arrow-left" style="margin-top: 2px;"></i></td>
+                    <td>
+                        <div class="battery-wrapper">
+                            <div class="battery-soc charged" style="width:40%"></div>
+                            <div class="battery-soc uncharged" style="width:60%"></div>
+                            <div class="battery-overlay"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>charging</td>
+                    <td><i class="icon-arrow-right" style="margin-top: 2px;"></i></td>
+                    <td>
+                        <div class="battery-wrapper" >
+                            <div class="battery-soc charged" style="width:40%"></div>
+                            <div class="battery-soc uncharged" style="width:60%"></div>
+                            <div class="battery-overlay"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>standby</td>
+                    <td><i class="icon-ban-circle" style="margin-top: 2px;"></i></td>
+                    <td>
+                        <div class="battery-wrapper" >
+                            <div class="battery-soc charged offline" style="width:40%"></div>
+                            <div class="battery-soc uncharged" style="width:60%"></div>
+                            <div class="battery-overlay"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>standby</td>
+                    <td><i class="icon-ban-circle" style="margin-top: 2px;"></i></td>
+                    <td>
+                        <div class="battery-wrapper" >
+                            <div class="battery-soc charged" style="width:40%"></div>
+                            <div class="battery-soc uncharged" style="width:60%"></div>
+                            <div class="battery-overlay"></div>
+                            <div class="battery-standby"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SOC% Quality Invalid</td>
+                    <td><i class="icon-arrow-left" style="margin-top: 2px;"></i></td>
+                    <td>
+                        <div class="battery-wrapper" >
+                            <div class="battery-soc unknown" style="width:40%"></div>
+                            <div class="battery-soc unknown" style="width:60%"></div>
+                            <div class="battery-overlay"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>alarmed</td>
+                    <td></td>
+                    <td>
+                        <div class="battery-wrapper">
+                            <div class="battery-soc charged alarmed" style="width:40%"></div>
+                            <div class="battery-soc uncharged alarmed" style="width:60%"></div>
+                            <div class="battery-overlay"></div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+               <h2>Old</h2>
                 <table class="table table-condensed">
                     <thead>
                         <tr>
@@ -79,85 +161,6 @@
                                     <div class="" style="display: block; float: left; margin-top: 2px; width: 40%; height: 26px; background-color: red;"></div>
                                     <div class="" style="display: block; float: left; margin-top: 2px; width: 60%; height: 26px; background-color: black;"></div>
                                     <div class="" style="position: relative; left: -4px; width: 60px; height: 100%; background-image: url('images/battery60x30.png');"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>by class</td>
-                            <td>false</td>
-                            <td>true</td>
-                            <td>
-                                <div class="battery-wrapper">
-                                    <div class="battery-soc charged" style="width:40%"></div>
-                                    <div class="battery-soc uncharged" style="width:60%"></div>
-                                    <div class="battery-overlay"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>by class charging</td>
-                            <td>false</td>
-                            <td>true</td>
-                            <td>
-                                <div class="battery-wrapper">
-                                    <div class="battery-soc charged" style="width:40%"></div>
-                                    <div class="battery-soc uncharged" style="width:60%"></div>
-                                    <div class="battery-overlay"></div>
-                                    <div class="battery-charging"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>by class charging on left</td>
-                            <td>false</td>
-                            <td>true</td>
-                            <td>
-                                <!--<div class="" style="height: 30px; width:15px; background-image: url('img/charging15x30.png')"><i class="icon-arrow-right" style="margin-left: 20px"></i></div>-->
-                                <div class="battery-wrapper" >
-                                    <div class="battery-soc charged" style="width:40%"></div>
-                                    <div class="battery-soc uncharged" style="width:60%"></div>
-                                    <div class="battery-overlay"></div>
-                                    <div class="battery-charging" style=""><i class="icon-arrow-right" style="margin-left: 18px; margin-top:2px"></i></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>by class standby on left</td>
-                            <td>false</td>
-                            <td>true</td>
-                            <td>
-                                <!--<div class="" style="height: 30px; width:15px; background-image: url('img/charging15x30.png')"><i class="icon-arrow-right" style="margin-left: 20px"></i></div>-->
-                                <div class="battery-wrapper" >
-                                    <div class="battery-soc charged" style="width:40%"></div>
-                                    <div class="battery-soc uncharged" style="width:60%"></div>
-                                    <div class="battery-overlay"></div>
-                                    <div class="battery-standby" style=""></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>by class standby on left</td>
-                            <td>false</td>
-                            <td>true</td>
-                            <td>
-                                <!--<div class="" style="height: 30px; width:15px; background-image: url('img/charging15x30.png')"><i class="icon-arrow-right" style="margin-left: 20px"></i></div>-->
-                                <div class="battery-wrapper" >
-                                    <div class="battery-soc charged" style="width:40%"></div>
-                                    <div class="battery-soc uncharged" style="width:60%"></div>
-                                    <div class="battery-overlay"></div>
-                                    <div class="battery-standby2" style=""></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>by class</td>
-                            <td>false</td>
-                            <td>true</td>
-                            <td>
-                                <div class="battery-wrapper">
-                                    <div class="battery-soc charged alarmed" style="width:40%"></div>
-                                    <div class="battery-soc uncharged alarmed" style="width:60%"></div>
-                                    <div class="battery-overlay"></div>
                                 </div>
                             </td>
                         </tr>
