@@ -25,7 +25,7 @@ object ApplicationBuild extends Build {
     resolvers += "scala-tools" at "http://repo.typesafe.com/typesafe/scala-tools-releases-cache",
     credentials += Credentials( Path.userHome / ".ivy2" / ".credentials"),
     resolvers += "totalgrid-snapshot" at totalGridSnapshot,
-    resolvers += "totalgrid-release" at totalGridRelease//
+    resolvers += "totalgrid-release" at totalGridRelease
   )
 
   val appDependencies = Seq(

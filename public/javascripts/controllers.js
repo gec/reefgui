@@ -275,6 +275,8 @@ function EssesControl($rootScope, $scope, $filter, reef) {
     $scope.esses = []     // our mappings of data from the server
     $scope.equipment = [] // from the server. TODO this should not be scope, but get assignes to scope.
     $scope.searchText = ""
+    $scope.sortColumn = "name"
+    $scope.reverse = false
     var pointNameMap = {}
 
     $rootScope.currentMenuItem = "esses";
@@ -379,6 +381,8 @@ function EssesControl($rootScope, $scope, $filter, reef) {
                 $scope.esses[ info.essIndex].standbyOrOnline = "Standby"
             else
                 $scope.esses[ info.essIndex].standbyOrOnline = "Online"
+        } else if( info.type == "%SOC") {
+            $scope.esses[ info.essIndex].percentSocMax100 = Math.min( value, 100)
         }
         $scope.esses[ info.essIndex][info.type] = value
         $scope.esses[ info.essIndex].state = getState( $scope.esses[ info.essIndex])
@@ -396,6 +400,7 @@ function EssesControl($rootScope, $scope, $filter, reef) {
             Standby: "",
             Charging: "",
             "%SOC": "",
+            percentSocMax100: 0, // Used by batter symbol
             standbyOrOnline: "", // "Standby", "Online"
             state: "s"    // "standby", "charging", "discharging"
         }

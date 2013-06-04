@@ -91,11 +91,11 @@ angular.module('charlotte.filters', []).
     filter('essStateIcon', function() {
         return function(state) {
             if( state === "standby")
-                return "icon-ban-circle"
+                return "images/standby14.png"
             else if( state === "charging")
-                return "icon-arrow-right"
+                return "images/charging14.png"
             else if( state === "discharging")
-                return "icon-arrow-left"
+                return "images/discharging14.png"
             else
                 return ""
         };
@@ -107,7 +107,7 @@ angular.module('charlotte.filters', []).
     }).
     filter('essBatterySocChargedClass', function() {
         return function(soc, state) {
-            var classes = ( soc > 10 ) ? "battery-soc charged" : "battery-soc charged alarmed"
+            var classes = ( soc > 20 && soc < 95) ? "battery-soc charged" : "battery-soc charged alarmed"
             if( state === "standby" )
                 classes += " standby"
             return classes
@@ -118,7 +118,7 @@ angular.module('charlotte.filters', []).
             var classes = null
             if( soc === null || soc === "" )
                 classes = "battery-soc unknown"
-            else if( soc > 10 )
+            else if( soc > 20 && soc < 95)
                 classes = "battery-soc uncharged"
             else
                 classes = "battery-soc uncharged alarmed"
