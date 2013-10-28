@@ -16,16 +16,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// No package. Just the root context. It's what play wants.
 
-import akka.actor.{Props, ActorContext}
+import play.api._
 import controllers.Application
 import org.totalgrid.reef.client.Client
-import play.api._
-import libs.concurrent.Akka
 import play.api.Application
+import play.api.libs.concurrent.Akka
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.JsValue
 import play.api.Play.current
+import akka.actor.{Props, ActorContext}
 import org.totalgrid.coral.models._
 
 
@@ -42,7 +43,10 @@ object ClientPushActorFactory extends WebSocketPushActorFactory{
   }
 }
 
-
+/**
+ *
+ * @author Flint O'Brien
+ */
 object Global extends GlobalSettings {
 
   lazy val reefConnectionManager = Akka.system.actorOf(Props( new ReefConnectionManager( ClientPushActorFactory)), "ReefConnectionManager")
@@ -50,9 +54,10 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
     super.onStart(app)
 
-    Logger.info( "Application started")
+    Logger.info( "Application starting...")
     Logger.info( "Starting reef connection manager " + reefConnectionManager)
     Application.reefConnectionManager = reefConnectionManager
+    Logger.info( "Application started")
 
     /*
     play.api.Play.mode(app) match {
@@ -63,4 +68,3 @@ object Global extends GlobalSettings {
 
   }
 }
-

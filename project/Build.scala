@@ -40,7 +40,10 @@ object ApplicationBuild extends Build {
   val main = play.Project(appName, appVersion, appDependencies)
     .settings( baseSettings: _*)
     .settings(
-      routesImport += "models.QueryBinders._"
+      routesImport += "models.QueryBinders._",
+      requireJs += "login.js",
+      requireJs += "app.js",
+      requireJsShim += "app.js"
     )
 
 }

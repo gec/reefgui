@@ -56,9 +56,6 @@ trait ReefAuthenticationImpl extends ReefAuthentication {
   def logoutFailure(request: RequestHeader): PlainResult =
     Unauthorized( Json.obj( "error" -> AUTHTOKEN_UNRECOGNIZED))
 
-  def authenticationFailed(request: RequestHeader, status: ConnectionStatus): Result =
-    Unauthorized( Json.obj( "error" -> status))
-
   def loginJsError(request: RequestHeader, error: JsError): Result =
     BadRequest( "invalidRequest " + JsError.toFlatJson(error))
 

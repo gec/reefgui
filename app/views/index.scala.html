@@ -1,6 +1,6 @@
-@(message: String)
+@(title: String)
 
-@main(message) {
+@main(title, routes.Assets.at("javascripts/app")) {
 <div class="statusBanner">
     <div class="statusCenter" ng-controller="ReefStatusControl" ng-show="visible">
         <div class="statusBlock">
@@ -11,55 +11,13 @@
     </div>
 </div>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container-fluid">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="#">Reef</a>
-            <div class="nav-collapse collapse">
-                <p class="navbar-text pull-right">
-                    <a href="#/logout" class="navbar-link">Logout</a>
-                </p>
-                <!--
-                <p class="navbar-text pull-right">
-                    Logged in as <a href="#" class="navbar-link">Username</a>
-                </p>
-                -->
-                    <!--<ul class="nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>-->
-            </div><!--/.nav-collapse -->
-        </div>
-    </div>
-</div>
+<nav-bar-top href="/menus/root"></nav-bar-top>
 
 <div class="container-fluid" ng-controller="MenuControl">
-    <div class="row-fluid">
+    <div class="row-fluid" style="margin-top: 60px;">
         <div class="span2">
             <div class="well sidebar-nav" ng-show="currentMenuItem != 'loading'">
-                <ul class="nav nav-list">
-                    <li class="nav-header">Model</li>
-                    <li ng-class="isActive('entities')"><a href="#/entities">Entities</a></li>
-                    <li ng-class="isActive('points')"><a href="#/points">Points</a></li>
-                    <li ng-class="isActive('commands')"><a href="#/commands">Commands</a></li>
-                    <li class="nav-header">Data</li>
-                    <li ng-class="isActive('esses')"><a href="#/esses">CES</a></li>
-                    <li ng-class="isActive('measurements')"><a href="#/measurements">Measurements</a></li>
-                    <li ng-class="isActive('events')"><a href="#/events">Events</a></li>
-                    <li ng-class="isActive('alarms')"><a href="#/alarms">Alarms</a></li>
-                    <li class="nav-header">Components</li>
-                    <li ng-class="isActive('endpointconnections')"><a href="#/endpointconnections">Endpoints</a></li>
-                    <li ng-class="isActive('applications')"><a href="#/applications">Applications</a></li>
-                    <li class="nav-header">Auth</li>
-                    <li ng-class="isActive('agents')"><a href="#/agents">Agents</a></li>
-                    <li ng-class="isActive('permissionsets')"><a href="#/permissionsets">Permission Sets</a></li>
-                </ul>
+                <nav-list href="/coral/menus/root"></nav-list>
             </div>
         </div>
         <div class="span10">
